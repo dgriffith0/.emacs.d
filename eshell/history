@@ -1,0 +1,8 @@
+ls
+cd ..
+ls
+cargo --version
+nvim
+cargo run
+clojure -v
+clojure
