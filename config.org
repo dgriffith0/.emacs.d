@@ -97,10 +97,11 @@ Hides some ugly generated code into its own file.
 
 #+begin_src emacs-lisp
 
-  (use-package dashboard
-    :ensure t
-    :config
-    (dashboard-setup-startup-hook))
+     (use-package dashboard
+       :ensure t
+       :config
+       (setq dashboard-startup-banner 'logo)
+       (dashboard-setup-startup-hook))
 
 #+end_src
 
@@ -111,54 +112,60 @@ Hides some ugly generated code into its own file.
 
 #+begin_src emacs-lisp
 
-    ;; Make ESC quit prompts
-    (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
+      ;; Make ESC quit prompts
+      (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
 
-    (use-package general
-    :config
-    (general-create-definer my/leader-keys
-      :keymaps '(normal insert visual emacs)
-      :prefix "SPC"
-      :global-prefix "C-SPC")
+      (use-package general
+      :config
+      (general-create-definer my/leader-keys
+        :keymaps '(normal insert visual emacs)
+        :prefix "SPC"
+        :global-prefix "C-SPC")
 
-    (my/leader-keys
-      "e"  '(treemacs :which-key "File tree")
-      "b"  '(counsel-switch-buffer :which-key "Buffers")
-      "t"  '(:ignore t :which-key "Toggles")
-      "tt" '(counsel-load-theme :which-key "Choose theme")))
+      (my/leader-keys
+        "e"  '(treemacs :which-key "File tree")
+        "b"  '(counsel-switch-buffer :which-key "Buffers")
+        "t"  '(:ignore t :which-key "Toggles")
+        "tt" '(counsel-load-theme :which-key "Choose theme")))
 
-    (use-package evil
-    :init
-    (setq evil-want-integration t)
-    (setq evil-want-keybinding nil)
-    (setq evil-want-C-u-scroll t)
-    (setq evil-want-C-i-jump nil)
-    :config
-    (evil-mode 1)
-    (evil-set-undo-system 'undo-redo)
-    (define-key evil-insert-state-map (kbd "C-g") 'evil-normal-state)
-    (define-key evil-insert-state-map (kbd "C-h") 'evil-delete-backward-char-and-join)
+      (use-package evil
+      :init
+      (setq evil-want-integration t)
+      (setq evil-want-keybinding nil)
+      (setq evil-want-C-u-scroll t)
+      (setq evil-want-C-i-jump nil)
+      :config
+      (evil-mode 1)
+      (evil-set-undo-system 'undo-redo)
+      (define-key evil-insert-state-map (kbd "C-g") 'evil-normal-state)
+      (define-key evil-insert-state-map (kbd "C-h") 'evil-delete-backward-char-and-join)
 
-    ;; Use visual line motions even outside of visual-line-mode buffers
-    (evil-global-set-key 'motion "j" 'evil-next-visual-line)
-    (evil-global-set-key 'motion "k" 'evil-previous-visual-line)
+      ;; Use visual line motions even outside of visual-line-mode buffers
+      (evil-global-set-key 'motion "j" 'evil-next-visual-line)
+      (evil-global-set-key 'motion "k" 'evil-previous-visual-line)
 
-    (evil-set-initial-state 'messages-buffer-mode 'normal)
-    (evil-set-initial-state 'dashboard-mode 'normal)
+      (evil-set-initial-state 'messages-buffer-mode 'normal)
+      (evil-set-initial-state 'dashboard-mode 'normal)
 
-    (evil-define-key 'normal 'lsp-ui-doc-mode
-      [?K] #'lsp-ui-doc-focus-frame)
-    )
+      (evil-global-set-key 'normal "K" 'lsp-ui-doc-toggle-focus-frame)
 
-  (use-package evil-collection
-    :after evil
-    :config
-    (evil-collection-init))
+      (evil-define-key 'normal 'lsp-ui-doc-frame-mode
+        [?q] #'lsp-ui-doc-hide)
 
-  (use-package evil-surround
-    :ensure t
-    :config
-    (global-evil-surround-mode 1))
+      (evil-define-key 'normal 'lsp-ui-doc-frame-mode
+        [escape] 'lsp-ui-doc-hide)
+
+      (evil-normalize-keymaps))
+
+    (use-package evil-collection
+      :after evil
+      :config
+      (evil-collection-init))
+
+    (use-package evil-surround
+      :ensure t
+      :config
+      (global-evil-surround-mode 1))
 
 #+end_src
 
@@ -546,30 +553,35 @@ Type "<el" and Tab to create a code block.
 
 #+begin_src emacs-lisp
 
-  ;; (unless (package-installed-p 'cider)
-  ;;   (package-install 'cider))
+  (unless (package-installed-p 'cider)
+    (package-install 'cider))
 
 #+end_src
 
 ** Clojure LSP Config
 
 #+begin_src emacs-lisp
-  ;; (use-package lsp-mode
-  ;;   :ensure t
-  ;;   :hook ((clojure-mode . lsp)
-  ;;          (clojurec-mode . lsp)
-  ;;          (clojurescript-mode . lsp))
-  ;;   :config
-  ;;   ;; add paths to your local installation of project mgmt tools, like lein
-  ;;   (setenv "PATH" (concat
-  ;;                    "/usr/local/bin" path-separator
-  ;;                    (getenv "PATH")))
-  ;;   (dolist (m '(clojure-mode
-  ;;                clojurec-mode
-  ;;                clojurescript-mode
-  ;;                clojurex-mode))
-  ;;      (add-to-list 'lsp-language-id-configuration `(,m . "clojure")))
-  ;;   (setq lsp-clojure-server-command '("/path/to/clojure-lsp"))) ;; Optional: In case `clojure-lsp` is not in your $PATH
+    (use-package lsp-mode
+      :ensure t
+      :hook ((clojure-mode . lsp)
+             (clojurec-mode . lsp)
+             (clojurescript-mode . lsp))
+      :config
+      ;; add paths to your local installation of project mgmt tools, like lein
+      (setenv "PATH" (concat
+                       "/usr/local/bin" path-separator
+                       (getenv "PATH")))
+      (dolist (m '(clojure-mode
+                   clojurec-mode
+                   clojurescript-mode
+                   clojurex-mode))
+         (add-to-list 'lsp-language-id-configuration `(,m . "clojure")))
+      (setq lsp-clojure-server-command '("/path/to/clojure-lsp"))) ;; Optional: In case `clojure-lsp` is not in your $PATH
+
+  (add-hook 'clojure-mode-hook 'lsp)
+  (add-hook 'clojurescript-mode-hook 'lsp)
+  (add-hook 'clojurec-mode-hook 'lsp)
+
 
 #+end_src
 
@@ -577,10 +589,32 @@ Type "<el" and Tab to create a code block.
 
 #+begin_src emacs-lisp
 
-  ;; (unless (package-installed-p 'clojure-mode)
-  ;;   (package-install 'clojure-mode))
+  (use-package flycheck-clj-kondo
+      :ensure t)
+
+    (use-package clojure-mode
+      :ensure t
+      :config
+      (require 'flycheck-clj-kondo))
 
 #+end_src
+
+** Structural Editing
+
+#+begin_src emacs-lisp
+
+  (use-package lispy
+    :init
+    (setq lispy-compat '(magit-blame-mode cider))
+    :hook ((emacs-lisp-mode . (lambda () (lispy-mode 1)))))
+
+  (use-package lispyville
+    :init
+    (general-add-hook '(emacs-lisp-mode-hook lisp-mode-hook) #'lispyville-mode)
+    :config
+    (lispyville-set-key-theme '(operators c-w additional)))
+
+  #+end_src
 
 * Rust
 

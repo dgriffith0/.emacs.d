@@ -53,6 +53,7 @@
 (use-package dashboard
   :ensure t
   :config
+  (setq dashboard-startup-banner 'logo)
   (dashboard-setup-startup-hook))
 
 ;; Make ESC quit prompts
@@ -68,15 +69,10 @@
   (my/leader-keys
     "e"  '(treemacs :which-key "File tree")
     "b"  '(counsel-switch-buffer :which-key "Buffers")
+    "f"  '(find-file :which-key "Find File")
+    "F"  '(projectile-ripgrep :which-key "Find Text")
     "t"  '(:ignore t :which-key "Toggles")
     "tt" '(counsel-load-theme :which-key "Choose theme")))
-
-(defun lsp-ui-doc-toggle-focus-frame ()
-  "Toggle focus and unfocus `lsp-ui-doc-frame'."
-  (interactive)
-  (if (lsp-ui-doc--frame-visible-p)
-      (lsp-ui-doc-focus-frame)
-      (lsp-ui-doc-glance)))
 
   (use-package evil
   :init
@@ -315,8 +311,6 @@
 (use-package evil-commentary
   :after evil
   :config (evil-commentary-mode))
-
-;;add evil surround add lsp ui key config to org
 
 ;; (unless (package-installed-p 'cider)
 ;;   (package-install 'cider))
