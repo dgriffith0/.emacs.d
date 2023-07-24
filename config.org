@@ -37,7 +37,11 @@ Hides some ugly generated code into its own file.
 
 #+begin_src emacs-lisp
 
-  (setq custom-file "C:\\Users\\dgrif\\AppData\\Roaming\\.emacs.d\\custom.el")
+(if
+    (or (eq system-type 'ms-dos) (eq system-type 'windows-nt))
+    (setq custom-file "C:\\Users\\dgrif\\AppData\\Roaming\\.emacs.d\\custom.el")    
+  (setq custom-file "~/.emacs.d/custom.el"))
+  
   (load custom-file)
 
 #+end_src
@@ -80,7 +84,11 @@ Hides some ugly generated code into its own file.
 
 #+begin_src emacs-lisp
 
-  (defvar my/default-font-size 80)
+
+  (if
+      (or (eq system-type 'ms-dos) (eq system-type 'windows-nt))
+      (defvar my/default-font-size 70)
+    (defvar my/default-font-size 120))
 
   (set-face-attribute 'default nil :font  "Fira Code" :height my/default-font-size)
   ;; Set the fixed pitch face
@@ -394,12 +402,14 @@ This snippet adds a hook to =org-mode= buffers so that =my/org-babel-tangle-conf
   ;; Automatically tangle our config.org config file when we save it
   (defun my/org-babel-tangle-config ()
     (when (string-equal (buffer-file-name)
-                        (expand-file-name  "C:\\Users\\dgrif\\AppData\\Roaming\\.emacs.d\\custom.org"))
-      ;; Dynamic scoping to the rescue
-      (let ((org-confirm-babel-evaluate nil))
-        (org-babel-tangle))))
+                        (if (or (eq system-type 'ms-dos) (eq system-type 'windows-nt))
+                            (expand-file-name  "C:\\Users\\dgrif\\AppData\\Roaming\\.emacs.d\\custom.org")
+                          (expand-file-name "~/.emacs.d/custom.org"))
+                        ;; Dynamic scoping to the rescue
+                        (let ((org-confirm-babel-evaluate nil))
+                          (org-babel-tangle))))
 
-  (add-hook 'org-mode-hook (lambda () (add-hook 'after-save-hook #'my/org-babel-tangle-config)))
+    (add-hook 'org-mode-hook (lambda () (add-hook 'after-save-hook #'my/org-babel-tangle-config)))
 
 #+end_src
 
