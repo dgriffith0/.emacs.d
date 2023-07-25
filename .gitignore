@@ -48,3 +48,9 @@ flycheck_*.el
 /network-security.data
 
 .cache/
+
+/transient/
+recentf
+projectile-bookmarks.eld
+projectile.cache
+.lsp-session-v1
