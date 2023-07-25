@@ -50,6 +50,7 @@ flycheck_*.el
 .cache/
 
 /transient/
+/fonts/
 recentf
 projectile-bookmarks.eld
 projectile.cache
