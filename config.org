@@ -93,7 +93,6 @@ Hides some ugly generated code into its own file.
   (set-face-attribute 'default nil :font  "Fira Code" :height my/default-font-size)
   ;; Set the fixed pitch face
   (set-face-attribute 'fixed-pitch nil :font "Fira Code" :height my/default-font-size)
-
   ;; Set the variable pitch face
   (set-face-attribute 'variable-pitch nil :font "Fira Code" :height my/default-font-size :weight 'regular)
 
@@ -120,61 +119,71 @@ Hides some ugly generated code into its own file.
 
 #+begin_src emacs-lisp
 
-      ;; Make ESC quit prompts
-      (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
+  ;; Make ESC quit prompts
+  (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
 
-      (use-package general
-      :config
-      (general-create-definer my/leader-keys
-        :keymaps '(normal insert visual emacs)
-        :prefix "SPC"
-        :global-prefix "C-SPC")
+  (defun lsp-ui-doc-toggle-focus-frame ()
+    "Toggle focus and unfocus `lsp-ui-doc-frame'."
+    (interactive)
+    (if (lsp-ui-doc--frame-visible-p) (lsp-ui-doc-focus-frame)
+      (lsp-ui-doc-glance)))
 
-      (my/leader-keys
-        "e"  '(treemacs :which-key "File tree")
-        "b"  '(counsel-switch-buffer :which-key "Buffers")
-        "t"  '(:ignore t :which-key "Toggles")
-        "tt" '(counsel-load-theme :which-key "Choose theme")))
+  (use-package general
+    :config
+    (general-create-definer my/leader-keys
+      :keymaps '(normal insert visual emacs)
+      :prefix "SPC"
+      :global-prefix "C-SPC")
 
-      (use-package evil
-      :init
-      (setq evil-want-integration t)
-      (setq evil-want-keybinding nil)
-      (setq evil-want-C-u-scroll t)
-      (setq evil-want-C-i-jump nil)
-      :config
-      (evil-mode 1)
-      (evil-set-undo-system 'undo-redo)
-      (define-key evil-insert-state-map (kbd "C-g") 'evil-normal-state)
-      (define-key evil-insert-state-map (kbd "C-h") 'evil-delete-backward-char-and-join)
+    (my/leader-keys
+      "e"  '(treemacs :which-key "File tree")
+      "b"  '(counsel-switch-buffer :which-key "Buffers")
+      "f"  '(find-file :which-key "Find file")
+      "F"  '(projectile-ripgrep :which-key "Search Project")
+      "t"  '(:ignore t :which-key "Toggles")
+      "tt" '(counsel-load-theme :which-key "Choose theme")))
 
-      ;; Use visual line motions even outside of visual-line-mode buffers
-      (evil-global-set-key 'motion "j" 'evil-next-visual-line)
-      (evil-global-set-key 'motion "k" 'evil-previous-visual-line)
+  (use-package evil
+    :init
+    (setq evil-want-integration t)
+    (setq evil-want-keybinding nil)
+    (setq evil-want-C-u-scroll t)
+    (setq evil-want-C-i-jump nil)
+    :config
+    (evil-mode 1)
+    (evil-set-undo-system 'undo-redo)
+    (define-key evil-insert-state-map (kbd "C-g") 'evil-normal-state)
+    (define-key evil-insert-state-map (kbd "C-h") 'evil-delete-backward-char-and-join)
 
-      (evil-set-initial-state 'messages-buffer-mode 'normal)
-      (evil-set-initial-state 'dashboard-mode 'normal)
+    ;; Use visual line motions even outside of visual-line-mode buffers
+    (evil-global-set-key 'motion "j" 'evil-next-visual-line)
+    (evil-global-set-key 'motion "k" 'evil-previous-visual-line)
 
-      (evil-global-set-key 'normal "K" 'lsp-ui-doc-toggle-focus-frame)
+    (evil-set-initial-state 'messages-buffer-mode 'normal)
+    (evil-set-initial-state 'dashboard-mode 'normal)
 
-      (evil-define-key 'normal 'lsp-ui-doc-frame-mode
-        [?q] #'lsp-ui-doc-hide)
+    (evil-global-set-key 'normal "K" 'lsp-ui-doc-toggle-focus-frame)
 
-      (evil-define-key 'normal 'lsp-ui-doc-frame-mode
-        [escape] 'lsp-ui-doc-hide)
+    (evil-define-key 'normal 'lsp-ui-doc-frame-mode
+      [?q] #'lsp-ui-doc-hide)
 
-      (evil-normalize-keymaps))
+    (evil-define-key 'normal 'lsp-ui-doc-frame-mode
+      [escape] 'lsp-ui-doc-hide)
 
-    (use-package evil-collection
-      :after evil
-      :config
-      (evil-collection-init))
+    (evil-normalize-keymaps))
 
-    (use-package evil-surround
-      :ensure t
-      :config
-      (global-evil-surround-mode 1))
+  (use-package evil-collection
+    :after evil
+    :config
+        (evil-collection-init))
 
+  (use-package evil-surround
+    :ensure t
+    :config
+    (global-evil-surround-mode 1))
+
+  (electric-pair-mode 1)
+  
 #+end_src
 
 #+RESULTS:
@@ -404,7 +413,7 @@ This snippet adds a hook to =org-mode= buffers so that =my/org-babel-tangle-conf
     (when (string-equal (buffer-file-name)
                         (if (or (eq system-type 'ms-dos) (eq system-type 'windows-nt))
                             (expand-file-name  "C:/Users/dgrif/AppData/Roaming/.emacs.d/custom.org")
-                          (expand-file-name "~/.emacs.d/custom.org"))
+                          (expand-file-name "~/.emacs.d/custom.org")))
                         ;; Dynamic scoping to the rescue
                         (let ((org-confirm-babel-evaluate nil))
                           (org-babel-tangle))))
@@ -578,15 +587,15 @@ Type "<el" and Tab to create a code block.
              (clojurescript-mode . lsp))
       :config
       ;; add paths to your local installation of project mgmt tools, like lein
-      (setenv "PATH" (concat
-                       "/usr/local/bin" path-separator
-                       (getenv "PATH")))
+      ;;(setenv "PATH" (concat
+      ;;                 "/usr/local/bin" path-separator
+      ;;                 (getenv "PATH")))
       (dolist (m '(clojure-mode
                    clojurec-mode
                    clojurescript-mode
                    clojurex-mode))
          (add-to-list 'lsp-language-id-configuration `(,m . "clojure")))
-      (setq lsp-clojure-server-command '("/path/to/clojure-lsp"))) ;; Optional: In case `clojure-lsp` is not in your $PATH
+      ;;(setq lsp-clojure-server-command '("/path/to/clojure-lsp"))) ;; Optional: In case `clojure-lsp` is not in your $PATH
 
   (add-hook 'clojure-mode-hook 'lsp)
   (add-hook 'clojurescript-mode-hook 'lsp)

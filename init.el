@@ -53,7 +53,6 @@
 (set-face-attribute 'default nil :font  "Fira Code" :height my/default-font-size)
 ;; Set the fixed pitch face
 (set-face-attribute 'fixed-pitch nil :font "Fira Code" :height my/default-font-size)
-
 ;; Set the variable pitch face
 (set-face-attribute 'variable-pitch nil :font "Fira Code" :height my/default-font-size :weight 'regular)
 
@@ -64,9 +63,15 @@
   (dashboard-setup-startup-hook))
 
 ;; Make ESC quit prompts
-  (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
+(global-set-key (kbd "<escape>") 'keyboard-escape-quit)
 
-  (use-package general
+(defun lsp-ui-doc-toggle-focus-frame ()
+  "Toggle focus and unfocus `lsp-ui-doc-frame'."
+  (interactive)
+  (if (lsp-ui-doc--frame-visible-p) (lsp-ui-doc-focus-frame)
+    (lsp-ui-doc-glance)))
+
+(use-package general
   :config
   (general-create-definer my/leader-keys
     :keymaps '(normal insert visual emacs)
@@ -76,10 +81,12 @@
   (my/leader-keys
     "e"  '(treemacs :which-key "File tree")
     "b"  '(counsel-switch-buffer :which-key "Buffers")
+    "f"  '(find-file :which-key "Find file")
+    "F"  '(projectile-ripgrep :which-key "Search Project")
     "t"  '(:ignore t :which-key "Toggles")
     "tt" '(counsel-load-theme :which-key "Choose theme")))
 
-  (use-package evil
+(use-package evil
   :init
   (setq evil-want-integration t)
   (setq evil-want-keybinding nil)
@@ -111,12 +118,14 @@
 (use-package evil-collection
   :after evil
   :config
-  (evil-collection-init))
+      (evil-collection-init))
 
 (use-package evil-surround
   :ensure t
   :config
   (global-evil-surround-mode 1))
+
+(electric-pair-mode 1)
 
 (use-package doom-themes
   :init (load-theme 'doom-gruvbox))
@@ -246,7 +255,7 @@
   (when (string-equal (buffer-file-name)
                       (if (or (eq system-type 'ms-dos) (eq system-type 'windows-nt))
                           (expand-file-name  "C:/Users/dgrif/AppData/Roaming/.emacs.d/custom.org")
-                        (expand-file-name "~/.emacs.d/custom.org"))
+                        (expand-file-name "~/.emacs.d/custom.org")))
                       ;; Dynamic scoping to the rescue
                       (let ((org-confirm-babel-evaluate nil))
                         (org-babel-tangle))))
