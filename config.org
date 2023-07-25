@@ -39,7 +39,7 @@ Hides some ugly generated code into its own file.
 
 (if
     (or (eq system-type 'ms-dos) (eq system-type 'windows-nt))
-    (setq custom-file "C:\\Users\\dgrif\\AppData\\Roaming\\.emacs.d\\custom.el")    
+    (setq custom-file "C:/Users/dgrif/AppData/Roaming/.emacs.d/custom.el")    
   (setq custom-file "~/.emacs.d/custom.el"))
   
   (load custom-file)
@@ -403,7 +403,7 @@ This snippet adds a hook to =org-mode= buffers so that =my/org-babel-tangle-conf
   (defun my/org-babel-tangle-config ()
     (when (string-equal (buffer-file-name)
                         (if (or (eq system-type 'ms-dos) (eq system-type 'windows-nt))
-                            (expand-file-name  "C:\\Users\\dgrif\\AppData\\Roaming\\.emacs.d\\custom.org")
+                            (expand-file-name  "C:/Users/dgrif/AppData/Roaming/.emacs.d/custom.org")
                           (expand-file-name "~/.emacs.d/custom.org"))
                         ;; Dynamic scoping to the rescue
                         (let ((org-confirm-babel-evaluate nil))
@@ -429,7 +429,7 @@ Type "<el" and Tab to create a code block.
 #+end_src
 
 #+RESULTS:
-: ((el . src emacs-lisp) (a . export ascii) (c . center) (C . comment) (e . example) (E . export) (h . export html) (l . export latex) (q . quote) (s . src) (v . verse))
+: ((el . src emacs-lisp) (a . export ascii) (c . center) (C . comment) (e . example) (E \\. export) (h . export html) (l . export latex) (q . quote) (s . src) (v . verse))
 
 * Development Plugins
 

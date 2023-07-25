@@ -16,8 +16,12 @@
 (require 'use-package)
 (setq use-package-always-ensure t)
 
-(setq custom-file "C:\\Users\\dgrif\\AppData\\Roaming\\.emacs.d\\custom.el")
-(load custom-file)
+(if
+    (or (eq system-type 'ms-dos) (eq system-type 'windows-nt))
+    (setq custom-file "C:/Users/dgrif/AppData/Roaming/.emacs.d/custom.el")    
+  (setq custom-file "~/.emacs.d/custom.el"))
+  
+  (load custom-file)
 
 (setq inhibit-startup-message t)
 
@@ -41,7 +45,10 @@
                 eshell-mode-hoo))
   (add-hook mode (lambda () (display-line-numbers-mode 0))))
 
-(defvar my/default-font-size 80)
+(if
+    (or (eq system-type 'ms-dos) (eq system-type 'windows-nt))
+    (defvar my/default-font-size 70)
+  (defvar my/default-font-size 120))
 
 (set-face-attribute 'default nil :font  "Fira Code" :height my/default-font-size)
 ;; Set the fixed pitch face
@@ -69,8 +76,6 @@
   (my/leader-keys
     "e"  '(treemacs :which-key "File tree")
     "b"  '(counsel-switch-buffer :which-key "Buffers")
-    "f"  '(find-file :which-key "Find File")
-    "F"  '(projectile-ripgrep :which-key "Find Text")
     "t"  '(:ignore t :which-key "Toggles")
     "tt" '(counsel-load-theme :which-key "Choose theme")))
 
@@ -239,12 +244,14 @@
 ;; Automatically tangle our config.org config file when we save it
 (defun my/org-babel-tangle-config ()
   (when (string-equal (buffer-file-name)
-                      (expand-file-name  "C:\\Users\\dgrif\\AppData\\Roaming\\.emacs.d\\custom.org"))
-    ;; Dynamic scoping to the rescue
-    (let ((org-confirm-babel-evaluate nil))
-      (org-babel-tangle))))
+                      (if (or (eq system-type 'ms-dos) (eq system-type 'windows-nt))
+                          (expand-file-name  "C:/Users/dgrif/AppData/Roaming/.emacs.d/custom.org")
+                        (expand-file-name "~/.emacs.d/custom.org"))
+                      ;; Dynamic scoping to the rescue
+                      (let ((org-confirm-babel-evaluate nil))
+                        (org-babel-tangle))))
 
-(add-hook 'org-mode-hook (lambda () (add-hook 'after-save-hook #'my/org-babel-tangle-config)))
+  (add-hook 'org-mode-hook (lambda () (add-hook 'after-save-hook #'my/org-babel-tangle-config)))
 
 (require 'org-tempo)
 
@@ -312,27 +319,47 @@
   :after evil
   :config (evil-commentary-mode))
 
-;; (unless (package-installed-p 'cider)
-;;   (package-install 'cider))
+(unless (package-installed-p 'cider)
+  (package-install 'cider))
 
-;; (use-package lsp-mode
-;;   :ensure t
-;;   :hook ((clojure-mode . lsp)
-;;          (clojurec-mode . lsp)
-;;          (clojurescript-mode . lsp))
-;;   :config
-;;   ;; add paths to your local installation of project mgmt tools, like lein
-;;   (setenv "PATH" (concat
-;;                    "/usr/local/bin" path-separator
-;;                    (getenv "PATH")))
-;;   (dolist (m '(clojure-mode
-;;                clojurec-mode
-;;                clojurescript-mode
-;;                clojurex-mode))
-;;      (add-to-list 'lsp-language-id-configuration `(,m . "clojure")))
-;;   (setq lsp-clojure-server-command '("/path/to/clojure-lsp"))) ;; Optional: In case `clojure-lsp` is not in your $PATH
+(use-package lsp-mode
+    :ensure t
+    :hook ((clojure-mode . lsp)
+           (clojurec-mode . lsp)
+           (clojurescript-mode . lsp))
+    :config
+    ;; add paths to your local installation of project mgmt tools, like lein
+    (setenv "PATH" (concat
+                     "/usr/local/bin" path-separator
+                     (getenv "PATH")))
+    (dolist (m '(clojure-mode
+                 clojurec-mode
+                 clojurescript-mode
+                 clojurex-mode))
+       (add-to-list 'lsp-language-id-configuration `(,m . "clojure")))
+    (setq lsp-clojure-server-command '("/path/to/clojure-lsp"))) ;; Optional: In case `clojure-lsp` is not in your $PATH
 
-;; (unless (package-installed-p 'clojure-mode)
-;;   (package-install 'clojure-mode))
+(add-hook 'clojure-mode-hook 'lsp)
+(add-hook 'clojurescript-mode-hook 'lsp)
+(add-hook 'clojurec-mode-hook 'lsp)
+
+(use-package flycheck-clj-kondo
+    :ensure t)
+
+  (use-package clojure-mode
+    :ensure t
+    :config
+    (require 'flycheck-clj-kondo))
+
+(use-package lispy
+  :init
+  (setq lispy-compat '(magit-blame-mode cider))
+  :hook ((emacs-lisp-mode . (lambda () (lispy-mode 1)))))
+
+(use-package lispyville
+  :init
+  (general-add-hook '(emacs-lisp-mode-hook lisp-mode-hook) #'lispyville-mode)
+  :config
+  (lispyville-set-key-theme '(operators c-w additional)))
 
 (use-package rustic)
