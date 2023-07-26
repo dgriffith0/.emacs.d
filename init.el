@@ -45,10 +45,11 @@
                 eshell-mode-hoo))
   (add-hook mode (lambda () (display-line-numbers-mode 0))))
 
-(if
-    (or (eq system-type 'ms-dos) (eq system-type 'windows-nt))
-    (defvar my/default-font-size 70)
-  (defvar my/default-font-size 120))
+(defvar my/default-font-size
+  (if (or (eq system-type 'ms-dos)
+          (eq system-type 'windows-nt))
+      80
+    120))
 
 (set-face-attribute 'default nil :font  "Fira Code" :height my/default-font-size)
 ;; Set the fixed pitch face
@@ -236,7 +237,7 @@
 
 (defun my/org-mode-visual-fill ()
   (setq visual-fill-column-width 100)
-  ;; (setq visual-fill-column-center-text t)
+  (setq visual-fill-column-center-text t)
   (visual-fill-column-mode 1))
 
 (use-package visual-fill-column
@@ -338,15 +339,15 @@
            (clojurescript-mode . lsp))
     :config
     ;; add paths to your local installation of project mgmt tools, like lein
-    (setenv "PATH" (concat
-                     "/usr/local/bin" path-separator
-                     (getenv "PATH")))
+    ;;(setenv "PATH" (concat
+    ;;                 "/usr/local/bin" path-separator
+    ;;                 (getenv "PATH")))
     (dolist (m '(clojure-mode
                  clojurec-mode
                  clojurescript-mode
                  clojurex-mode))
-       (add-to-list 'lsp-language-id-configuration `(,m . "clojure")))
-    (setq lsp-clojure-server-command '("/path/to/clojure-lsp"))) ;; Optional: In case `clojure-lsp` is not in your $PATH
+       (add-to-list 'lsp-language-id-configuration `(,m . "clojure"))))
+    ;;(setq lsp-clojure-server-command '("/path/to/clojure-lsp"))) ;; Optional: In case `clojure-lsp` is not in your $PATH
 
 (add-hook 'clojure-mode-hook 'lsp)
 (add-hook 'clojurescript-mode-hook 'lsp)

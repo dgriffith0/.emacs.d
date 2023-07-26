@@ -85,17 +85,18 @@ Hides some ugly generated code into its own file.
 #+begin_src emacs-lisp
 
 
-  (if
-      (or (eq system-type 'ms-dos) (eq system-type 'windows-nt))
-      (defvar my/default-font-size 70)
-    (defvar my/default-font-size 120))
+  (defvar my/default-font-size
+    (if (or (eq system-type 'ms-dos)
+            (eq system-type 'windows-nt))
+        80
+      120))
 
   (set-face-attribute 'default nil :font  "Fira Code" :height my/default-font-size)
   ;; Set the fixed pitch face
   (set-face-attribute 'fixed-pitch nil :font "Fira Code" :height my/default-font-size)
   ;; Set the variable pitch face
   (set-face-attribute 'variable-pitch nil :font "Fira Code" :height my/default-font-size :weight 'regular)
-
+  
 #+end_src
 
 #+RESULTS:
@@ -375,7 +376,7 @@ Hides some ugly generated code into its own file.
 
   (defun my/org-mode-visual-fill ()
     (setq visual-fill-column-width 100)
-    ;; (setq visual-fill-column-center-text t)
+    (setq visual-fill-column-center-text t)
     (visual-fill-column-mode 1))
 
   (use-package visual-fill-column
@@ -594,7 +595,7 @@ Type "<el" and Tab to create a code block.
                    clojurec-mode
                    clojurescript-mode
                    clojurex-mode))
-         (add-to-list 'lsp-language-id-configuration `(,m . "clojure")))
+         (add-to-list 'lsp-language-id-configuration `(,m . "clojure"))))
       ;;(setq lsp-clojure-server-command '("/path/to/clojure-lsp"))) ;; Optional: In case `clojure-lsp` is not in your $PATH
 
   (add-hook 'clojure-mode-hook 'lsp)
