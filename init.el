@@ -63,6 +63,12 @@
   (setq dashboard-startup-banner 'logo)
   (dashboard-setup-startup-hook))
 
+(setq dashboard-items '((recents  . 5)
+                      (bookmarks . 5)
+                      (projects . 5)
+                      (agenda . 5)
+                      (registers . 5)))
+
 ;; Make ESC quit prompts
 (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
 
@@ -79,13 +85,17 @@
     :prefix "SPC"
     :global-prefix "C-SPC")
 
-  (my/leader-keys
-    "e"  '(treemacs :which-key "File tree")
-    "b"  '(counsel-switch-buffer :which-key "Buffers")
-    "f"  '(find-file :which-key "Find file")
-    "F"  '(projectile-ripgrep :which-key "Search Project")
-    "t"  '(:ignore t :which-key "Toggles")
-    "tt" '(counsel-load-theme :which-key "Choose theme")))
+(my/leader-keys
+  "e"  '(treemacs :which-key "File tree")
+  "b"  '(:ignore t :which-key "Buffers")
+  "bb" '(counsel-switch-buffer :which-key "Search")
+  "bh" '(previous-buffer :which-key "Previous")
+  "bk" '(kill-buffer :which-key "Kill")
+  "bl" '(next-buffer :which-key "Next")
+  "f"  '(find-file :which-key "Find file")
+  "F"  '(projectile-ripgrep :which-key "Search Project")
+  "t"  '(:ignore t :which-key "Toggles")
+  "tt" '(counsel-load-theme :which-key "Choose theme")))
 
 (use-package evil
   :init
@@ -297,7 +307,7 @@
   :commands (lsp lsp-deferred)
   :hook (lsp-mode . my/lsp-mode-setup)
   :init
-  (setq lsp-keymap-prefix "C-c l")  ;; Or 'C-l', 's-l'
+  (setq lsp-keymap-prefix "C-l")  ;; Or 'C-l', 's-l'
   :config
   (lsp-enable-which-key-integration t))
 
@@ -306,8 +316,22 @@
   :custom
   (lsp-ui-doc-position 'at-point))
 
+(use-package treemacs)
+
 (use-package lsp-treemacs
-  :after lsp)
+      :after lsp)
+
+(use-package treemacs-evil
+    :after (treemacs evil)
+    :ensure t)
+
+(use-package treemacs-icons-dired
+  :hook (dired-mode . treemacs-icons-dired-enable-once)
+  :ensure t)
+
+(use-package treemacs-magit
+  :after (treemacs magit)
+  :ensure t)
 
 (use-package lsp-ivy)
 
@@ -332,26 +356,26 @@
 (unless (package-installed-p 'cider)
   (package-install 'cider))
 
-(use-package lsp-mode
-    :ensure t
-    :hook ((clojure-mode . lsp)
-           (clojurec-mode . lsp)
-           (clojurescript-mode . lsp))
-    :config
-    ;; add paths to your local installation of project mgmt tools, like lein
-    ;;(setenv "PATH" (concat
-    ;;                 "/usr/local/bin" path-separator
-    ;;                 (getenv "PATH")))
-    (dolist (m '(clojure-mode
-                 clojurec-mode
-                 clojurescript-mode
-                 clojurex-mode))
-       (add-to-list 'lsp-language-id-configuration `(,m . "clojure"))))
-    ;;(setq lsp-clojure-server-command '("/path/to/clojure-lsp"))) ;; Optional: In case `clojure-lsp` is not in your $PATH
+;;   (use-package lsp-mode
+;;     :ensure t
+;;     :hook ((clojure-mode . lsp)
+;;            (clojurec-mode . lsp)
+;;            (clojurescript-mode . lsp))
+;;     :config
+;;     ;; add paths to your local installation of project mgmt tools, like lein
+;;     ;;(setenv "PATH" (concat
+;;     ;;                 "/usr/local/bin" path-separator
+;;     ;;                 (getenv "PATH")))
+;;     (dolist (m '(clojure-mode
+;;                  clojurec-mode
+;;                  clojurescript-mode
+;;                  clojurex-mode))
+;;        (add-to-list 'lsp-language-id-configuration(,m . "clojure"))))
+;;     ;;(setq lsp-clojure-server-command '("/path/to/clojure-lsp"))) ;; Optional: In case `clojure-lsp` is not in your $PATH
 
-(add-hook 'clojure-mode-hook 'lsp)
-(add-hook 'clojurescript-mode-hook 'lsp)
-(add-hook 'clojurec-mode-hook 'lsp)
+;; (add-hook 'clojure-mode-hook 'lsp)
+;; (add-hook 'clojurescript-mode-hook 'lsp)
+;; (add-hook 'clojurec-mode-hook 'lsp)
 
 (use-package flycheck-clj-kondo
     :ensure t)

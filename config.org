@@ -1,4 +1,4 @@
-#+title Emacs Configuration
+
 #+PROPERTY: header-args:emacs-lisp :tangle ./init.el
 
 * Emacs Config
@@ -105,11 +105,17 @@ Hides some ugly generated code into its own file.
 
 #+begin_src emacs-lisp
 
-     (use-package dashboard
-       :ensure t
-       :config
-       (setq dashboard-startup-banner 'logo)
-       (dashboard-setup-startup-hook))
+  (use-package dashboard
+    :ensure t
+    :config
+    (setq dashboard-startup-banner 'logo)
+    (dashboard-setup-startup-hook))
+
+  (setq dashboard-items '((recents  . 5)
+                        (bookmarks . 5)
+                        (projects . 5)
+                        (agenda . 5)
+                        (registers . 5)))
 
 #+end_src
 
@@ -184,7 +190,7 @@ Hides some ugly generated code into its own file.
     (global-evil-surround-mode 1))
 
   (electric-pair-mode 1)
-  
+
 #+end_src
 
 #+RESULTS:
@@ -501,10 +507,10 @@ Type "<el" and Tab to create a code block.
     :commands (lsp lsp-deferred)
     :hook (lsp-mode . my/lsp-mode-setup)
     :init
-    (setq lsp-keymap-prefix "C-c l")  ;; Or 'C-l', 's-l'
+    (setq lsp-keymap-prefix "C-l")  ;; Or 'C-l', 's-l'
     :config
     (lsp-enable-which-key-integration t))
-  
+
 #+end_src
 
 ** LSP UI
@@ -524,9 +530,24 @@ Type "<el" and Tab to create a code block.
 
 #+begin_src emacs-lisp
 
+  (use-package treemacs)
+
   (use-package lsp-treemacs
-    :after lsp)
-  
+        :after lsp)
+
+  (use-package treemacs-evil
+      :after (treemacs evil)
+      :ensure t)
+
+  (use-package treemacs-icons-dired
+    :hook (dired-mode . treemacs-icons-dired-enable-once)
+    :ensure t)
+
+  (use-package treemacs-magit
+    :after (treemacs magit)
+    :ensure t)
+
+
 #+end_src
 
 ** LSP Ivy
@@ -581,26 +602,26 @@ Type "<el" and Tab to create a code block.
 ** Clojure LSP Config
 
 #+begin_src emacs-lisp
-    (use-package lsp-mode
-      :ensure t
-      :hook ((clojure-mode . lsp)
-             (clojurec-mode . lsp)
-             (clojurescript-mode . lsp))
-      :config
-      ;; add paths to your local installation of project mgmt tools, like lein
-      ;;(setenv "PATH" (concat
-      ;;                 "/usr/local/bin" path-separator
-      ;;                 (getenv "PATH")))
-      (dolist (m '(clojure-mode
-                   clojurec-mode
-                   clojurescript-mode
-                   clojurex-mode))
-         (add-to-list 'lsp-language-id-configuration `(,m . "clojure"))))
-      ;;(setq lsp-clojure-server-command '("/path/to/clojure-lsp"))) ;; Optional: In case `clojure-lsp` is not in your $PATH
+  ;;   (use-package lsp-mode
+  ;;     :ensure t
+  ;;     :hook ((clojure-mode . lsp)
+  ;;            (clojurec-mode . lsp)
+  ;;            (clojurescript-mode . lsp))
+  ;;     :config
+  ;;     ;; add paths to your local installation of project mgmt tools, like lein
+  ;;     ;;(setenv "PATH" (concat
+  ;;     ;;                 "/usr/local/bin" path-separator
+  ;;     ;;                 (getenv "PATH")))
+  ;;     (dolist (m '(clojure-mode
+  ;;                  clojurec-mode
+  ;;                  clojurescript-mode
+  ;;                  clojurex-mode))
+  ;;        (add-to-list 'lsp-language-id-configuration(,m . "clojure"))))
+  ;;     ;;(setq lsp-clojure-server-command '("/path/to/clojure-lsp"))) ;; Optional: In case `clojure-lsp` is not in your $PATH
 
-  (add-hook 'clojure-mode-hook 'lsp)
-  (add-hook 'clojurescript-mode-hook 'lsp)
-  (add-hook 'clojurec-mode-hook 'lsp)
+  ;; (add-hook 'clojure-mode-hook 'lsp)
+  ;; (add-hook 'clojurescript-mode-hook 'lsp)
+  ;; (add-hook 'clojurec-mode-hook 'lsp)
 
 
 #+end_src
