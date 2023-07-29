@@ -89,13 +89,17 @@
   "e"  '(treemacs :which-key "File tree")
   "b"  '(:ignore t :which-key "Buffers")
   "bb" '(counsel-switch-buffer :which-key "Search")
-  "bh" '(previous-buffer :which-key "Previous")
-  "bk" '(kill-buffer :which-key "Kill")
-  "bl" '(next-buffer :which-key "Next")
-  "f"  '(find-file :which-key "Find file")
+  "bp" '(previous-buffer :which-key "Previous")
+  "bk" '(kill-this-buffer :which-key "Kill")
+  "bn" '(next-buffer :which-key "Next")
+  "f"  '(projectile-find-file :which-key "Find file")
   "F"  '(projectile-ripgrep :which-key "Search Project")
+  "l"  '(:ignore t :which-key "Lsp")
+  "la" '(lsp-execute-code-action :which-key "Code Actions")
   "t"  '(:ignore t :which-key "Toggles")
-  "tt" '(counsel-load-theme :which-key "Choose theme")))
+  "tt" '(counsel-load-theme :which-key "Choose theme")
+  ","  '(:ignore t :which-key "Rust")
+  ",," '((lambda () (interactive) (eshell-command "cargo run")) :which-key "Run")))
 
 (use-package evil
   :init
