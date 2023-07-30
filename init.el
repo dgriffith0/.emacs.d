@@ -338,7 +338,7 @@
   :ensure t)
 
 (use-package lsp-ivy)
-
+	
 (use-package company
   :after lsp-mode
   :hook (lsp-mode . company-mode)
@@ -360,26 +360,10 @@
 (unless (package-installed-p 'cider)
   (package-install 'cider))
 
-;;   (use-package lsp-mode
-;;     :ensure t
-;;     :hook ((clojure-mode . lsp)
-;;            (clojurec-mode . lsp)
-;;            (clojurescript-mode . lsp))
-;;     :config
-;;     ;; add paths to your local installation of project mgmt tools, like lein
-;;     ;;(setenv "PATH" (concat
-;;     ;;                 "/usr/local/bin" path-separator
-;;     ;;                 (getenv "PATH")))
-;;     (dolist (m '(clojure-mode
-;;                  clojurec-mode
-;;                  clojurescript-mode
-;;                  clojurex-mode))
-;;        (add-to-list 'lsp-language-id-configuration(,m . "clojure"))))
-;;     ;;(setq lsp-clojure-server-command '("/path/to/clojure-lsp"))) ;; Optional: In case `clojure-lsp` is not in your $PATH
-
-;; (add-hook 'clojure-mode-hook 'lsp)
-;; (add-hook 'clojurescript-mode-hook 'lsp)
-;; (add-hook 'clojurec-mode-hook 'lsp)
+;;Clojure LSP hooks
+(add-hook 'clojure-mode-hook 'lsp)
+(add-hook 'clojurescript-mode-hook 'lsp)
+(add-hook 'clojurec-mode-hook 'lsp)
 
 (use-package flycheck-clj-kondo
     :ensure t)
@@ -400,4 +384,10 @@
   :config
   (lispyville-set-key-theme '(operators c-w additional)))
 
-(use-package rustic)
+
+(use-package rustic
+  :defines lsp-rust-analyzer-diagnostics-disabled
+  :init
+  (setq lsp-rust-analyzer-diagnostics-disabled ["unresolved-proc-macro"]))
+
+
